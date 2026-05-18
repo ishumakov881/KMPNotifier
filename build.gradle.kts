@@ -22,16 +22,15 @@ apiValidation {
 }
 
 allprojects {
-    group = "io.github.mirzemehdi"
-    version = project.properties["kmpNotifierVersion"] as String
+    group = project.findProperty("GROUP")?.toString() ?: "io.github.mirzemehdi"
+    version = project.findProperty("VERSION")?.toString() ?: project.properties["kmpNotifierVersion"] as String
+}
 
-
+subprojects {
     val excludedModules = listOf(":sample")
-    if (project.path in excludedModules) return@allprojects
+    if (project.path in excludedModules) return@subprojects
 
     apply(plugin = "org.jetbrains.dokka")
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
 }
 
 

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinNativeCocoaPods)
     alias(libs.plugins.mavenPublish)
+    signing
 }
 
 kotlin {
@@ -102,9 +103,9 @@ mavenPublishing {
         )
     )
     coordinates(
-        "io.github.mirzemehdi",
+        project.group.toString(),
         "kmpnotifier",
-        project.properties["kmpNotifierVersion"] as String
+        project.version.toString()
     )
     pom {
         name = "KMPNotifier"
