@@ -1,7 +1,7 @@
 # KMPNotifier - Kotlin Multiplatform Push Notification
-[![Build](https://github.com/mirzemehdi/KMPNotifier/actions/workflows/build.yml/badge.svg)](https://github.com/mirzemehdi/KMPNotifier/actions/workflows/build.yml) 
+[![Build](https://github.com/ishumakov881/KMPNotifier/actions/workflows/build.yml/badge.svg)](https://github.com/ishumakov881/KMPNotifier/actions/workflows/build.yml) 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.10-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.mirzemehdi/kmpnotifier?color=blue)](https://search.maven.org/search?q=g:io.github.mirzemehdi)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.ishumakov881/kmpnotifier?color=blue)](https://search.maven.org/search?q=g:io.github.ishumakov881)
 
 ![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
@@ -55,17 +55,17 @@ repositories {
 }
 ```
 
-Then in your shared module you add dependency in `commonMain`. Latest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.mirzemehdi/kmpnotifier?color=blue)](https://search.maven.org/search?q=g:io.github.mirzemehdi). In iOS framework part export this library as well.
+Then in your shared module you add dependency in `commonMain`. Latest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.ishumakov881/kmpnotifier?color=blue)](https://search.maven.org/search?q=g:io.github.ishumakov881). In iOS framework part export this library as well.
 ```kotlin
 sourceSets {
   commonMain.dependencies {
-    api("io.github.mirzemehdi:kmpnotifier:<version>") // in iOS export this library
+    api("io.github.ishumakov881:kmpnotifier:<version>") // in iOS export this library
   }
 }
 
 listOf(iosX64(),iosArm64(),iosSimulatorArm64()).forEach { iosTarget ->
   iosTarget.binaries.framework {
-    export("io.github.mirzemehdi:kmpnotifier:<version>")
+    export("io.github.ishumakov881:kmpnotifier:<version>")
     ...
   }
 }

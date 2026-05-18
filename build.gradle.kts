@@ -23,7 +23,7 @@ apiValidation {
 
 allprojects {
     val isJitPack = System.getenv("JITPACK") == "true"
-    group = if (isJitPack) "com.github.ishumakov881.KMPNotifier" else "io.github.mirzemehdi"
+    group = if (isJitPack) "com.github.ishumakov881.KMPNotifier" else "io.github.ishumakov881"
     version = if (isJitPack) (System.getenv("JITPACK_VERSION") ?: "1.0-SNAPSHOT") else (project.properties["kmpNotifierVersion"] as String)
 }
 

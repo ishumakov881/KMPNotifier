@@ -1,4 +1,5 @@
 name: Build
+
 on:
   push:
     branches: [ "main" ]
@@ -8,9 +9,6 @@ on:
       - '**/README.md'
   pull_request:
     branches: [ "main" ]
-
-
-
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
@@ -26,40 +24,46 @@ jobs:
   check:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Setup JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup gradle
-        uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Check api
         run: ./gradlew apiCheck
-
 
   build:
     strategy:
       matrix:
         config: [
-          { target: android, os: ubuntu-latest, tasks: testDebugUnitTest testReleaseUnitTest, continueOnError: false },
-          { target: apple, os: macos-latest, tasks: iosX64Test iosSimulatorArm64Test, continueOnError: false },
+          { target: android, os: ubuntu-latest, tasks: ":kmpnotifier:testDebugUnitTest :kmpnotifier:testReleaseUnitTest", continueOnError: false },
+          { target: apple, os: macos-latest, tasks: ":kmpnotifier:iosX64Test :kmpnotifier:iosSimulatorArm64Test", continueOnError: false },
+          { target: all-publications, os: macos-latest, tasks: ":kmpnotifier:publishToMavenLocal -Psigning.required=false", continueOnError: false },
         ]
     runs-on: ${{ matrix.config.os }}
     name: Build ${{ matrix.config.target }}
     needs: check
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Setup JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup gradle
-        uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install CocoaPods
+        if: runner.os == 'macOS'
+        run: sudo gem install cocoapods
 
       - name: Test ${{ matrix.config.target }} targets
         continue-on-error: ${{ matrix.config.continueOnError }}
@@ -84,7 +88,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup gradle
-        uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -101,30 +105,20 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Install GPG
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Validate publishable artifacts
+        run: ./gradlew :kmpnotifier:publishToMavenLocal -Psigning.required=false --no-configuration-cache
+
+      - name: Publish to Maven Central
         env:
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-        run: |
-          brew install gpg
-          echo "$SIGNING_KEY" | gpg --dearmor > ${HOME}/secret_key.gpg
-
-      - name: Add Gradle Properties
-        env:
-          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: |
-          echo "mavenCentralUsername=${MAVEN_CENTRAL_USERNAME}" >> gradle.properties
-          echo "mavenCentralPassword=${MAVEN_CENTRAL_PASSWORD}" >> gradle.properties
-          echo "signing.keyId=${SIGNING_KEY_ID}" >> gradle.properties
-          echo "signing.password=${SIGNING_KEY_PASSWORD}" >> gradle.properties
-          echo "signing.secretKeyRingFile=${HOME}/secret_key.gpg" >> gradle.properties
-
-      - name: Publish to MavenCentral
-        run: |
-          ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
-
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
+        run: ./gradlew :kmpnotifier:publishToMavenCentral --no-configuration-cache
 
       - name: Create new release from tag
         env:
@@ -133,5 +127,3 @@ jobs:
         with:
           generate_release_notes: true
           token: ${{ env.github_token }}
-
-

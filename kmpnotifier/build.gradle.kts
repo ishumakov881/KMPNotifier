@@ -14,7 +14,7 @@ plugins {
 kotlin {
     explicitApi()
     androidTarget {
-        publishLibraryVariants("release", "debug")
+        publishLibraryVariants("release")
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
@@ -110,7 +110,7 @@ mavenPublishing {
     pom {
         name = "KMPNotifier"
         description = "Kotlin Multiplatform Push Notification Library targeting ios and android"
-        url = "https://github.com/mirzemehdi/KMPNotifier/"
+        url = "https://github.com/ishumakov881/KMPNotifier/"
         licenses {
             license {
                 name.set("Apache-2.0")
@@ -119,24 +119,30 @@ mavenPublishing {
         }
         developers {
             developer {
-                name.set("Mirzamehdi Karimov")
-                email.set("mirzemehdi@gmail.com")
+                id.set("ishumakov881")
+                name.set("ishumakov881")
+                url.set("https://github.com/ishumakov881")
             }
         }
         scm {
-            connection.set("https://github.com/mirzemehdi/KMPNotifier.git")
-            url.set("https://github.com/mirzemehdi/KMPNotifier")
+            connection.set("scm:git:git://github.com/ishumakov881/KMPNotifier.git")
+            developerConnection.set("scm:git:ssh://git@github.com/ishumakov881/KMPNotifier.git")
+            url.set("https://github.com/ishumakov881/KMPNotifier")
         }
         issueManagement {
             system.set("Github")
-            url.set("https://github.com/mirzemehdi/KMPNotifier/issues")
+            url.set("https://github.com/ishumakov881/KMPNotifier/issues")
         }
     }
 
 
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
     val isSigningRequired = project.findProperty("signing.required")?.toString()?.toBoolean() ?: true
-    val hasSigningKeys = project.hasProperty("signing.keyId") || System.getenv("SIGNING_KEY_ID") != null
+    val hasSigningKeys =
+        project.hasProperty("signingInMemoryKey") ||
+            System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKey") != null ||
+            project.hasProperty("signing.keyId") ||
+            System.getenv("SIGNING_KEY_ID") != null
     
     if (isSigningRequired && hasSigningKeys) {
         signAllPublications()
@@ -145,7 +151,11 @@ mavenPublishing {
 
 signing {
     val isSigningRequired = project.findProperty("signing.required")?.toString()?.toBoolean() ?: true
-    val hasSigningKeys = project.hasProperty("signing.keyId") || System.getenv("SIGNING_KEY_ID") != null
+    val hasSigningKeys =
+        project.hasProperty("signingInMemoryKey") ||
+            System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKey") != null ||
+            project.hasProperty("signing.keyId") ||
+            System.getenv("SIGNING_KEY_ID") != null
     isRequired = isSigningRequired && hasSigningKeys
 }
 
