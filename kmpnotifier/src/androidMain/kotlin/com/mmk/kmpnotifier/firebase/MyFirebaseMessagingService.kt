@@ -8,7 +8,7 @@ import com.mmk.kmpnotifier.logger.currentLogger
 import com.mmk.kmpnotifier.notification.Notifier
 import com.mmk.kmpnotifier.notification.NotifierManagerImpl
 
-internal class MyFirebaseMessagingService : FirebaseMessagingService() {
+class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private val notifierManager by lazy { NotifierManagerImpl }
     private val notifier: Notifier by lazy { notifierManager.getLocalNotifier() }
