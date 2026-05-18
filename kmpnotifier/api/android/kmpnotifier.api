@@ -3,6 +3,12 @@ public final class com/mmk/kmpnotifier/extensions/NotifierManagerExtKt {
 	public static final fun onCreateOrOnNewIntent (Lcom/mmk/kmpnotifier/notification/NotifierManager;Landroid/content/Intent;)V
 }
 
+public class com/mmk/kmpnotifier/firebase/MyFirebaseMessagingService : com/google/firebase/messaging/FirebaseMessagingService {
+	public fun <init> ()V
+	public fun onMessageReceived (Lcom/google/firebase/messaging/RemoteMessage;)V
+	public fun onNewToken (Ljava/lang/String;)V
+}
+
 public abstract interface class com/mmk/kmpnotifier/logger/Logger {
 	public abstract fun log (Ljava/lang/String;)V
 }
