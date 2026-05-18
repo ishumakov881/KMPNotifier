@@ -22,8 +22,9 @@ apiValidation {
 }
 
 allprojects {
-    group = project.findProperty("GROUP")?.toString() ?: "io.github.mirzemehdi"
-    version = project.findProperty("VERSION")?.toString() ?: project.properties["kmpNotifierVersion"] as String
+    val isJitPack = System.getenv("JITPACK") == "true"
+    group = if (isJitPack) "com.github.ishumakov881.KMPNotifier" else "io.github.mirzemehdi"
+    version = if (isJitPack) (System.getenv("JITPACK_VERSION") ?: "1.0-SNAPSHOT") else (project.properties["kmpNotifierVersion"] as String)
 }
 
 subprojects {
