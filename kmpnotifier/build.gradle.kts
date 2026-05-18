@@ -134,6 +134,8 @@ mavenPublishing {
 
 
     publishToMavenCentral()
-    signAllPublications()
+    if (project.hasProperty("signing.keyId") || System.getenv("SIGNING_KEY_ID") != null) {
+        signAllPublications()
+    }
 }
 
