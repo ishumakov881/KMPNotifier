@@ -134,8 +134,17 @@ mavenPublishing {
 
 
     publishToMavenCentral()
-    if (project.hasProperty("signing.keyId") || System.getenv("SIGNING_KEY_ID") != null) {
+    val isSigningRequired = project.findProperty("signing.required")?.toString()?.toBoolean() ?: true
+    val hasSigningKeys = project.hasProperty("signing.keyId") || System.getenv("SIGNING_KEY_ID") != null
+    
+    if (isSigningRequired && hasSigningKeys) {
         signAllPublications()
     }
+}
+
+signing {
+    val isSigningRequired = project.findProperty("signing.required")?.toString()?.toBoolean() ?: true
+    val hasSigningKeys = project.hasProperty("signing.keyId") || System.getenv("SIGNING_KEY_ID") != null
+    isRequired = isSigningRequired && hasSigningKeys
 }
 

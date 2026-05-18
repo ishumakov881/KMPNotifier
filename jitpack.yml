@@ -3,4 +3,4 @@ jdk:
 before_install:
   - chmod +x gradlew
 install:
-  - ./gradlew :kmpnotifier:publishToMavenLocal -x test -x lint --no-daemon
+  - ./gradlew :kmpnotifier:publishToMavenLocal -x test -x lint -Psigning.required=false --no-daemon
