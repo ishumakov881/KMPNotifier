@@ -108,12 +108,19 @@ jobs:
           fi
 
           printf '%s' "${signing_key}" | gpg --dearmor > "${HOME}/secret_key.gpg"
+          signing_key_id="$(gpg --show-keys --with-colons "${HOME}/secret_key.gpg" | awk -F: '/^(sec|pub):/ { print substr($5, length($5) - 7); exit }')"
+
+          if [[ -z "${signing_key_id}" ]]; then
+            echo "::error::Could not derive signing key id from the provided PGP key."
+            exit 1
+          fi
+
+          echo "SIGNING_KEY_ID=${signing_key_id}" >> "${GITHUB_ENV}"
 
       - name: Add Gradle Properties
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID || secrets.SIGNING_IN_MEMORY_KEY_ID }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD || secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
         run: |
           echo "mavenCentralUsername=${MAVEN_CENTRAL_USERNAME}" >> gradle.properties
