@@ -94,10 +94,24 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
+          SIGNING_IN_MEMORY_KEY: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
-        run: ./gradlew :kmpnotifier:publishToMavenCentral --no-configuration-cache
+        run: |
+          signing_key="${SIGNING_IN_MEMORY_KEY}"
+          signing_key="${signing_key//\\n/$'\n'}"
+
+          if [[ "${signing_key}" != *"BEGIN PGP PRIVATE KEY BLOCK"* ]]; then
+            signing_key="$(printf '%s' "${SIGNING_IN_MEMORY_KEY}" | base64 --decode)"
+          fi
+
+          if [[ "${signing_key}" != *"BEGIN PGP PRIVATE KEY BLOCK"* ]]; then
+            echo "::error::SIGNING_IN_MEMORY_KEY must contain an ASCII-armored private PGP key or its base64-encoded value."
+            exit 1
+          fi
+
+          export ORG_GRADLE_PROJECT_signingInMemoryKey="${signing_key}"
+          ./gradlew :kmpnotifier:publishToMavenCentral --no-configuration-cache
 
       - name: Create new release from tag
         env:
