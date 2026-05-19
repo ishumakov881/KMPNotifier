@@ -2,12 +2,14 @@ name: Build
 
 on:
   push:
+    branches: [ "main" ]
     tags:
       - 'v*'
     paths-ignore:
       - '**/README.md'
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
@@ -130,7 +132,7 @@ jobs:
           echo "signing.secretKeyRingFile=${HOME}/secret_key.gpg" >> gradle.properties
 
       - name: Publish to Maven Central
-        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
+        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache --stacktrace
 
       - name: Create new release from tag
         env:
